@@ -232,28 +232,56 @@ class IndexPriceCard extends StatefulWidget {
   State<IndexPriceCard> createState() => _IndexPriceCardState();
 }
 
-class _IndexPriceCardState extends State<IndexPriceCard> {
+class _IndexPriceCardState extends State<IndexPriceCard>
+    with SingleTickerProviderStateMixin {
   static const int refreshIntervalSeconds = 30;
   late DateTime nextRefresh;
   Timer? _timer;
+  late final AnimationController _refreshController;
 
   @override
   void initState() {
     super.initState();
-    nextRefresh = widget.lastUpdated.add(const Duration(seconds: refreshIntervalSeconds));
+    final initialNextRefresh =
+        widget.lastUpdated.add(const Duration(seconds: refreshIntervalSeconds));
+
+    nextRefresh = initialNextRefresh.isAfter(DateTime.now())
+        ? initialNextRefresh
+        : DateTime.now().add(const Duration(seconds: refreshIntervalSeconds));
+
+    _refreshController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() {
-        if (!DateTime.now().isBefore(nextRefresh)) {
-          nextRefresh = DateTime.now().add(const Duration(seconds: refreshIntervalSeconds));
-        }
-      });
+
+      final now = DateTime.now();
+
+      if (!now.isBefore(nextRefresh)) {
+        setState(() {
+          nextRefresh = now.add(
+            const Duration(seconds: refreshIntervalSeconds),
+          );
+        });
+        _playRefreshAnimation();
+      } else {
+        setState(() {});
+      }
     });
+  }
+
+  void _playRefreshAnimation() {
+    _refreshController
+      ..reset()
+      ..forward();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _refreshController.dispose();
     super.dispose();
   }
 
@@ -348,7 +376,19 @@ class _IndexPriceCardState extends State<IndexPriceCard> {
             const SizedBox(height: 7),
             Row(
               children: [
-                const Icon(Icons.refresh, size: 12, color: Colors.white54),
+                RotationTransition(
+                  turns: Tween<double>(begin: 0, end: 1).animate(
+                    CurvedAnimation(
+                      parent: _refreshController,
+                      curve: Curves.easeInOut,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.refresh,
+                    size: 13,
+                    color: Colors.white54,
+                  ),
+                ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -377,21 +417,40 @@ class _IndexPriceCardState extends State<IndexPriceCard> {
               ],
             ),
             const SizedBox(height: 6),
-            Row(
-              children: [
-                const Icon(Icons.schedule, size: 11, color: Colors.white54),
-                const SizedBox(width: 4),
-                const Text('Next refresh', style: TextStyle(fontSize: 9, color: Colors.white54)),
-                const Spacer(),
-                Text(
-                  formatCountdown(),
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFF52E59A),
-                    fontWeight: FontWeight.bold,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFF163C2A).withOpacity(0.7),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.schedule, size: 11, color: Colors.white54),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Next refresh',
+                    style: TextStyle(fontSize: 9, color: Colors.white54),
                   ),
-                ),
-              ],
+                  const Spacer(),
+                  Text(
+                    formatTime(nextRefresh),
+                    style: const TextStyle(
+                      fontSize: 9,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '(${formatCountdown()})',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF52E59A),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 7),
             Container(
