@@ -208,13 +208,13 @@ class DashboardPage extends StatelessWidget {
 
 class IndexPriceCard extends StatefulWidget {
   final String symbol;
-  final String widget.price;
-  final String widget.change;
-  final String widget.percent;
-  final String widget.trend;
-  final String widget.marketStatus;
-  final DateTime widget.lastUpdated;
-  final List<double> widget.values;
+  final String price;
+  final String change;
+  final String percent;
+  final String trend;
+  final String marketStatus;
+  final DateTime lastUpdated;
+  final List<double> values;
 
   const IndexPriceCard({
     super.key,
@@ -267,7 +267,7 @@ class _IndexPriceCardState extends State<IndexPriceCard> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isOpen = widget.widget.marketStatus == 'MARKET OPEN';
+    final bool isOpen = widget.marketStatus == 'MARKET OPEN';
 
     String formatTime(DateTime time) {
       final hour = time.hour == 0 ? 12 : (time.hour > 12 ? time.hour - 12 : time.hour);
@@ -293,7 +293,7 @@ class _IndexPriceCardState extends State<IndexPriceCard> {
               children: [
                 Expanded(
                   child: Text(
-                    symbol,
+                    widget.symbol,
                     style: const TextStyle(fontSize: 13, color: Colors.white70, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -343,7 +343,7 @@ class _IndexPriceCardState extends State<IndexPriceCard> {
             SizedBox(
               height: 38,
               width: double.infinity,
-              child: Sparkline(widget.values: widget.values),
+              child: Sparkline(values: widget.values),
             ),
             const SizedBox(height: 7),
             Row(
