@@ -134,6 +134,8 @@ class DashboardPage extends StatelessWidget {
                 percent: '+0.50%',
                 trend: 'BULLISH',
                 marketStatus: 'MARKET OPEN',
+                lastUpdated: DateTime(2026, 9, 26, 9, 30, 15),
+                lastUpdated: DateTime(2026, 9, 26, 9, 30, 15),
                 values: [24780, 24820, 24805, 24870, 24840, 24910, 24890, 24955, 24920, 25000],
               ),
             ),
@@ -209,6 +211,7 @@ class IndexPriceCard extends StatelessWidget {
   final String percent;
   final String trend;
   final String marketStatus;
+  final DateTime lastUpdated;
   final List<double> values;
 
   const IndexPriceCard({
@@ -219,12 +222,21 @@ class IndexPriceCard extends StatelessWidget {
     required this.percent,
     required this.trend,
     required this.marketStatus,
+    required this.lastUpdated,
     required this.values,
   });
 
   @override
   Widget build(BuildContext context) {
     final bool isOpen = marketStatus == 'MARKET OPEN';
+
+    String formatTime(DateTime time) {
+      final hour = time.hour == 0 ? 12 : (time.hour > 12 ? time.hour - 12 : time.hour);
+      final minute = time.minute.toString().padLeft(2, '0');
+      final second = time.second.toString().padLeft(2, '0');
+      final period = time.hour >= 12 ? 'PM' : 'AM';
+      return '$hour:$minute:$second $period';
+    }
 
     return Card(
       color: const Color(0xFF121922),
@@ -293,6 +305,37 @@ class IndexPriceCard extends StatelessWidget {
               height: 38,
               width: double.infinity,
               child: Sparkline(values: values),
+            ),
+            const SizedBox(height: 7),
+            Row(
+              children: [
+                const Icon(Icons.refresh, size: 12, color: Colors.white54),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Updated ${formatTime(lastUpdated)}',
+                    style: const TextStyle(fontSize: 9, color: Colors.white54),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: isOpen ? const Color(0xFF52E59A) : const Color(0xFFFF7A90),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  isOpen ? 'LIVE' : 'OFFLINE',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: isOpen ? const Color(0xFF52E59A) : const Color(0xFFFF7A90),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 7),
             Container(
