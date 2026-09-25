@@ -127,7 +127,7 @@ class DashboardPage extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Row(
-          children: const [
+          children: [
             Expanded(
               child: IndexPriceCard(
                 symbol: 'NIFTY 50',
@@ -219,13 +219,13 @@ class IndexPriceCard extends StatefulWidget {
   const IndexPriceCard({
     super.key,
     required this.symbol,
-    required this.widget.price,
-    required this.widget.change,
-    required this.widget.percent,
-    required this.widget.trend,
-    required this.widget.marketStatus,
-    required this.widget.lastUpdated,
-    required this.widget.values,
+    required this.price,
+    required this.change,
+    required this.percent,
+    required this.trend,
+    required this.marketStatus,
+    required this.lastUpdated,
+    required this.values,
   });
 
   @override
