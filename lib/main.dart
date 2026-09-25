@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MajeedSmartAI());
@@ -135,7 +137,6 @@ class DashboardPage extends StatelessWidget {
                 trend: 'BULLISH',
                 marketStatus: 'MARKET OPEN',
                 lastUpdated: DateTime(2026, 9, 26, 9, 30, 15),
-                lastUpdated: DateTime(2026, 9, 26, 9, 30, 15),
                 values: [24780, 24820, 24805, 24870, 24840, 24910, 24890, 24955, 24920, 25000],
               ),
             ),
@@ -148,6 +149,7 @@ class DashboardPage extends StatelessWidget {
                 percent: '+0.57%',
                 trend: 'BULLISH',
                 marketStatus: 'MARKET OPEN',
+                lastUpdated: DateTime(2026, 9, 26, 9, 30, 15),
                 values: [54690, 54760, 54730, 54840, 54810, 54920, 54880, 55010, 54960, 55100],
               ),
             ),
@@ -204,31 +206,68 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-class IndexPriceCard extends StatelessWidget {
+class IndexPriceCard extends StatefulWidget {
   final String symbol;
-  final String price;
-  final String change;
-  final String percent;
-  final String trend;
-  final String marketStatus;
-  final DateTime lastUpdated;
-  final List<double> values;
+  final String widget.price;
+  final String widget.change;
+  final String widget.percent;
+  final String widget.trend;
+  final String widget.marketStatus;
+  final DateTime widget.lastUpdated;
+  final List<double> widget.values;
 
   const IndexPriceCard({
     super.key,
     required this.symbol,
-    required this.price,
-    required this.change,
-    required this.percent,
-    required this.trend,
-    required this.marketStatus,
-    required this.lastUpdated,
-    required this.values,
+    required this.widget.price,
+    required this.widget.change,
+    required this.widget.percent,
+    required this.widget.trend,
+    required this.widget.marketStatus,
+    required this.widget.lastUpdated,
+    required this.widget.values,
   });
 
   @override
+  State<IndexPriceCard> createState() => _IndexPriceCardState();
+}
+
+class _IndexPriceCardState extends State<IndexPriceCard> {
+  static const int refreshIntervalSeconds = 30;
+  late DateTime nextRefresh;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    nextRefresh = widget.lastUpdated.add(const Duration(seconds: refreshIntervalSeconds));
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() {
+        if (!DateTime.now().isBefore(nextRefresh)) {
+          nextRefresh = DateTime.now().add(const Duration(seconds: refreshIntervalSeconds));
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String formatCountdown() {
+    final remaining = nextRefresh.difference(DateTime.now());
+    final totalSeconds = remaining.inSeconds.clamp(0, refreshIntervalSeconds);
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bool isOpen = marketStatus == 'MARKET OPEN';
+    final bool isOpen = widget.widget.marketStatus == 'MARKET OPEN';
 
     String formatTime(DateTime time) {
       final hour = time.hour == 0 ? 12 : (time.hour > 12 ? time.hour - 12 : time.hour);
@@ -288,12 +327,12 @@ class IndexPriceCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              price,
+              widget.price,
               style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 5),
             Text(
-              '$change  ($percent)',
+              '$widget.change  ($widget.percent)',
               style: const TextStyle(
                 color: Color(0xFF52E59A),
                 fontSize: 12,
@@ -304,7 +343,7 @@ class IndexPriceCard extends StatelessWidget {
             SizedBox(
               height: 38,
               width: double.infinity,
-              child: Sparkline(values: values),
+              child: Sparkline(widget.values: widget.values),
             ),
             const SizedBox(height: 7),
             Row(
@@ -313,7 +352,7 @@ class IndexPriceCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    'Updated ${formatTime(lastUpdated)}',
+                    'Updated ${formatTime(widget.lastUpdated)}',
                     style: const TextStyle(fontSize: 9, color: Colors.white54),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -337,6 +376,23 @@ class IndexPriceCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.schedule, size: 11, color: Colors.white54),
+                const SizedBox(width: 4),
+                const Text('Next refresh', style: TextStyle(fontSize: 9, color: Colors.white54)),
+                const Spacer(),
+                Text(
+                  formatCountdown(),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Color(0xFF52E59A),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 7),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -345,7 +401,7 @@ class IndexPriceCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                trend,
+                widget.trend,
                 style: const TextStyle(
                   color: Color(0xFF52E59A),
                   fontSize: 10,
