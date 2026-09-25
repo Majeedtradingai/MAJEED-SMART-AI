@@ -133,6 +133,7 @@ class DashboardPage extends StatelessWidget {
                 change: '+125.40',
                 percent: '+0.50%',
                 trend: 'BULLISH',
+                marketStatus: 'MARKET OPEN',
                 values: [24780, 24820, 24805, 24870, 24840, 24910, 24890, 24955, 24920, 25000],
               ),
             ),
@@ -144,6 +145,7 @@ class DashboardPage extends StatelessWidget {
                 change: '+310.25',
                 percent: '+0.57%',
                 trend: 'BULLISH',
+                marketStatus: 'MARKET OPEN',
                 values: [54690, 54760, 54730, 54840, 54810, 54920, 54880, 55010, 54960, 55100],
               ),
             ),
@@ -206,6 +208,7 @@ class IndexPriceCard extends StatelessWidget {
   final String change;
   final String percent;
   final String trend;
+  final String marketStatus;
   final List<double> values;
 
   const IndexPriceCard({
@@ -215,11 +218,14 @@ class IndexPriceCard extends StatelessWidget {
     required this.change,
     required this.percent,
     required this.trend,
+    required this.marketStatus,
     required this.values,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bool isOpen = marketStatus == 'MARKET OPEN';
+
     return Card(
       color: const Color(0xFF121922),
       elevation: 0,
@@ -240,7 +246,32 @@ class IndexPriceCard extends StatelessWidget {
                     style: const TextStyle(fontSize: 13, color: Colors.white70, fontWeight: FontWeight.w600),
                   ),
                 ),
-                const Icon(Icons.trending_up, color: Color(0xFF52E59A), size: 21),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isOpen ? const Color(0xFF163C2A) : const Color(0xFF33242A),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.circle,
+                        size: 6,
+                        color: isOpen ? const Color(0xFF52E59A) : const Color(0xFFFF7A90),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        isOpen ? 'OPEN' : 'CLOSED',
+                        style: TextStyle(
+                          color: isOpen ? const Color(0xFF52E59A) : const Color(0xFFFF7A90),
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 8),
