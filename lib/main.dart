@@ -55,10 +55,7 @@ class _MainScreenState extends State<MainScreen> {
             padding: const EdgeInsets.only(right: 16),
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFF163C2A),
                   borderRadius: BorderRadius.circular(20),
@@ -124,10 +121,7 @@ class DashboardPage extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           'Paper trading • Demo market data',
-          style: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: Colors.grey, fontSize: 13),
         ),
         const SizedBox(height: 16),
         Row(
@@ -139,7 +133,7 @@ class DashboardPage extends StatelessWidget {
                 change: '+125.40',
                 percent: '+0.50%',
                 trend: 'BULLISH',
-                icon: Icons.trending_up,
+                values: [24780, 24820, 24805, 24870, 24840, 24910, 24890, 24955, 24920, 25000],
               ),
             ),
             SizedBox(width: 12),
@@ -150,7 +144,7 @@ class DashboardPage extends StatelessWidget {
                 change: '+310.25',
                 percent: '+0.57%',
                 trend: 'BULLISH',
-                icon: Icons.trending_up,
+                values: [54690, 54760, 54730, 54840, 54810, 54920, 54880, 55010, 54960, 55100],
               ),
             ),
           ],
@@ -167,57 +161,26 @@ class DashboardPage extends StatelessWidget {
             padding: EdgeInsets.all(18),
             child: Row(
               children: [
-                Icon(
-                  Icons.psychology,
-                  size: 34,
-                  color: Color(0xFF7C8CFF),
-                ),
+                Icon(Icons.psychology, size: 34, color: Color(0xFF7C8CFF)),
                 SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'AI Market Score',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white60,
-                        ),
-                      ),
+                      Text('AI Market Score', style: TextStyle(fontSize: 13, color: Colors.white60)),
                       SizedBox(height: 3),
-                      Text(
-                        '78 / 100',
-                        style: TextStyle(
-                          fontSize: 27,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        'Trend + momentum aligned',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white54,
-                        ),
-                      ),
+                      Text('78 / 100', style: TextStyle(fontSize: 27, fontWeight: FontWeight.w800)),
+                      Text('Trend + momentum aligned', style: TextStyle(fontSize: 12, color: Colors.white54)),
                     ],
                   ),
                 ),
-                Text(
-                  'BULLISH',
-                  style: TextStyle(
-                    color: Color(0xFF52E59A),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                Text('BULLISH', style: TextStyle(color: Color(0xFF52E59A), fontWeight: FontWeight.bold)),
               ],
             ),
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          'Market Status',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-        ),
+        const Text('Market Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
         const SizedBox(height: 10),
         Card(
           color: const Color(0xFF121922),
@@ -243,7 +206,7 @@ class IndexPriceCard extends StatelessWidget {
   final String change;
   final String percent;
   final String trend;
-  final IconData icon;
+  final List<double> values;
 
   const IndexPriceCard({
     super.key,
@@ -252,7 +215,7 @@ class IndexPriceCard extends StatelessWidget {
     required this.change,
     required this.percent,
     required this.trend,
-    required this.icon,
+    required this.values,
   });
 
   @override
@@ -265,7 +228,7 @@ class IndexPriceCard extends StatelessWidget {
         side: BorderSide(color: Colors.white.withOpacity(0.06)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -274,43 +237,35 @@ class IndexPriceCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     symbol,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: const TextStyle(fontSize: 13, color: Colors.white70, fontWeight: FontWeight.w600),
                   ),
                 ),
-                Icon(
-                  icon,
-                  color: const Color(0xFF52E59A),
-                  size: 21,
-                ),
+                const Icon(Icons.trending_up, color: Color(0xFF52E59A), size: 21),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
               price,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
+              style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 7),
+            const SizedBox(height: 5),
             Text(
               '$change  ($percent)',
               style: const TextStyle(
                 color: Color(0xFF52E59A),
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
+            SizedBox(
+              height: 38,
+              width: double.infinity,
+              child: Sparkline(values: values),
+            ),
+            const SizedBox(height: 7),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: const Color(0xFF163C2A),
                 borderRadius: BorderRadius.circular(8),
@@ -331,15 +286,66 @@ class IndexPriceCard extends StatelessWidget {
   }
 }
 
+class Sparkline extends StatelessWidget {
+  final List<double> values;
+
+  const Sparkline({super.key, required this.values});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: SparklinePainter(values),
+      child: const SizedBox.expand(),
+    );
+  }
+}
+
+class SparklinePainter extends CustomPainter {
+  final List<double> values;
+
+  SparklinePainter(this.values);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (values.length < 2 || size.width <= 0 || size.height <= 0) return;
+
+    final min = values.reduce((a, b) => a < b ? a : b);
+    final max = values.reduce((a, b) => a > b ? a : b);
+    final range = max - min == 0 ? 1 : max - min;
+
+    final path = Path();
+    for (var i = 0; i < values.length; i++) {
+      final x = size.width * i / (values.length - 1);
+      final y = size.height - ((values[i] - min) / range) * (size.height - 4) - 2;
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    final paint = Paint()
+      ..color = const Color(0xFF52E59A)
+      ..strokeWidth = 2.2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant SparklinePainter oldDelegate) {
+    return oldDelegate.values != values;
+  }
+}
+
 class SignalsPage extends StatelessWidget {
   const SignalsPage({super.key});
 
   @override
   Widget build(BuildContext context) => const Center(
-        child: Text(
-          'BUY Signal\nEntry: Demo\nSL: Demo\nT1: Demo',
-          textAlign: TextAlign.center,
-        ),
+        child: Text('BUY Signal\nEntry: Demo\nSL: Demo\nT1: Demo', textAlign: TextAlign.center),
       );
 }
 
@@ -348,10 +354,7 @@ class PortfolioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Center(
-        child: Text(
-          'Paper Balance\n₹100000\nP&L: ₹0',
-          textAlign: TextAlign.center,
-        ),
+        child: Text('Paper Balance\n₹100000\nP&L: ₹0', textAlign: TextAlign.center),
       );
 }
 
@@ -360,9 +363,6 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Center(
-        child: Text(
-          'Settings\nPaper Mode ON',
-          textAlign: TextAlign.center,
-        ),
+        child: Text('Settings\nPaper Mode ON', textAlign: TextAlign.center),
       );
 }
