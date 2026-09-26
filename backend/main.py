@@ -32,7 +32,7 @@ def root() -> dict[str, str]:
     return {"app": "MAJEED SMART AI", "service": "cloud-backend", "mode": "PAPER", "status": "ok"}
 
 @app.get("/api/health")
-def health(_: Any = Depends(require_app_token)) -> dict[str, Any]:
+def health() -> dict[str, Any]:
     snapshot = market.snapshot()
     return {"status": "ok", "angel_one_connected": snapshot["connected"], "timestamp": snapshot["timestamp"], "last_error": snapshot["last_error"]}
 
